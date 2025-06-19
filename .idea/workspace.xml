@@ -9,9 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -45,7 +43,7 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "CamiloBenitez",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/rbsca/OneDrive/Desktop/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/model"
   }
 }]]></component>
