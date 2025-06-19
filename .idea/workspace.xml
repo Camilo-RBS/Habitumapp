@@ -44,16 +44,16 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "CamiloBenitez",
-    "last_opened_file_path": "C:/Users/rbsca/OneDrive/Desktop/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical"
+    "last_opened_file_path": "C:/Users/rbsca/OneDrive/Desktop/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/viewmodel"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\viewmodel" />
+      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens\physical" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\main" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\componets" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\componets\services" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\componets\maps" />
     </key>
   </component>
   <component name="RunManager">
