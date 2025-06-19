@@ -10,12 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/repository/ReminderRepository.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,18 +45,18 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "davidSandoval",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/dsand/AndroidStudioProjects/appHabitum/app"
+    "last_opened_file_path": "C:/Users/dsand/AndroidStudioProjects/pdm-TESTING/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/repository"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dsand\AndroidStudioProjects\pdm-TESTING\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\repository" />
+      <recent name="C:\Users\dsand\AndroidStudioProjects\pdm-TESTING\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\model" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\model" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\viewmodel" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens\physical" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\main" />
     </key>
   </component>
   <component name="RunManager">
