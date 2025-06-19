@@ -9,12 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_19_6_2025_00_16_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_19_6_2025_00_16__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/model/Task.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/model/User.kt" afterDir="false" />
-    </list>
+    <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,7 +50,7 @@
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "diego__contreras",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/UCA/Ciclo01-2025/LabosMoviles/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/model"
+    "last_opened_file_path": "D:/UCA/Ciclo01-2025/LabosMoviles/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/ui/componets"
   }
 }]]></component>
   <component name="RecentsManager">
