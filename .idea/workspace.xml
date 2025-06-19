@@ -10,7 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/repository/ReminderRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/viewmodel/TaskViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,13 +25,18 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\dsand\.android\avd\Medium_Phone.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\diego\.android\avd\Medium_Phone.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -39,24 +49,31 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Android App.app.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "davidSandoval",
+    "git-widget-placeholder": "diego__contreras",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/dsand/AndroidStudioProjects/pdm-TESTING/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/repository"
+    "last_opened_file_path": "D:/UCA/Ciclo01-2025/LabosMoviles/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/viewmodel",
+    "project.structure.last.edited": "SDK Location",
+    "project.structure.proportion": "0.17",
+    "project.structure.side.proportion": "0.0"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\dsand\AndroidStudioProjects\pdm-TESTING\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\repository" />
-      <recent name="C:\Users\dsand\AndroidStudioProjects\pdm-TESTING\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\model" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\model" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\viewmodel" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens" />
+      <recent name="D:\UCA\Ciclo01-2025\LabosMoviles\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\viewmodel" />
+      <recent name="D:\UCA\Ciclo01-2025\LabosMoviles\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens\physical" />
+      <recent name="D:\UCA\Ciclo01-2025\LabosMoviles\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens" />
+      <recent name="D:\UCA\Ciclo01-2025\LabosMoviles\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\componets" />
+      <recent name="D:\UCA\Ciclo01-2025\LabosMoviles\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\repository" />
+    </key>
+    <key name="K2MoveDeclarationsDialog.RECENT_PACKAGE_KEY">
+      <recent name="com.wayneenterprises.habitum.ui.screens" />
     </key>
   </component>
   <component name="RunManager">
