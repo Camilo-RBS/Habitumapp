@@ -9,7 +9,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="" />
+    <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -44,16 +46,16 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "CamiloBenitez",
-    "last_opened_file_path": "C:/Users/rbsca/OneDrive/Desktop/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/viewmodel"
+    "last_opened_file_path": "C:/Users/rbsca/OneDrive/Desktop/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/model"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\model" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\viewmodel" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\screens\physical" />
       <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\main" />
-      <recent name="C:\Users\rbsca\OneDrive\Desktop\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\ui\componets" />
     </key>
   </component>
   <component name="RunManager">
