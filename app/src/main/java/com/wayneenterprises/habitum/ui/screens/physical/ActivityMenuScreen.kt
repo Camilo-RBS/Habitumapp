@@ -13,15 +13,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,6 +46,7 @@ import com.wayneenterprises.habitum.sensors.AccelerometerSensorManager
 import com.wayneenterprises.habitum.sensors.StepDetector
 import com.wayneenterprises.habitum.sensors.StepListener
 import com.wayneenterprises.habitum.viewmodel.StepViewModel
+import com.wayneenterprises.habitum.viewmodel.StepCounter
 
 @Composable
 fun ActivityMenuScreen(
@@ -52,57 +54,68 @@ fun ActivityMenuScreen(
     stepViewModel: StepViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
+    // OBSERVAR DATOS GLOBALES PERSISTENTES
     val dailySteps by stepViewModel.dailySteps.collectAsState()
     val weeklySteps by stepViewModel.weeklySteps.collectAsState()
+    val dailyGoal by stepViewModel.dailyGoal.collectAsState()
 
-    // Estado para controlar qué actividad está seleccionada
+    // Estado para actividad seleccionada
     var selectedActivity by remember { mutableStateOf<String?>(null) }
 
-    val stepDetector = remember { StepDetector() }
-    val accelerometerManager = remember {
-        AccelerometerSensorManager(context, stepDetector)
-    }
-
-    // Configurar el detector de pasos para conteo diario
+    // USAR DETECTOR GLOBAL - NO reinicializar
     LaunchedEffect(Unit) {
-        stepDetector.registerListener(object : StepListener {
-            override fun step(timeNs: Long) {
-                stepViewModel.incrementDailyStep()
-            }
-        })
-        accelerometerManager.start()
-    }
+        // Solo configurar si no existe ya
+        if (StepCounter.getStepDetector() == null) {
+            val stepDetector = StepDetector()
+            val accelerometerManager = AccelerometerSensorManager(context, stepDetector)
 
-    DisposableEffect(Unit) {
-        onDispose {
-            accelerometerManager.stop()
+            stepDetector.registerListener(object : StepListener {
+                override fun step(timeNs: Long) {
+                    stepViewModel.incrementDailyStep()
+                }
+            })
+
+            // Guardar referencias globales
+            StepCounter.setStepDetector(stepDetector)
+            StepCounter.setAccelerometer(accelerometerManager)
+
+            accelerometerManager.start()
+            println("🏃 ActivityMenuScreen - Detector INICIADO (primera vez)")
+        } else {
+            println("🏃 ActivityMenuScreen - Usando detector existente")
         }
+
+        // Inicializar datos (seguro de llamar múltiples veces)
+        stepViewModel.initializeDailySteps()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
+            .verticalScroll(scrollState)
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Círculo principal con contador de pasos
-        DailyStepsCircle(
+        // Círculo principal con contador PERSISTENTE
+        DailyStepsCirclePersistent(
             steps = dailySteps,
-            goal = 12000,
+            goal = dailyGoal,
             modifier = Modifier.size(180.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Texto de meta y porcentaje fuera del círculo
-        val progress = if (12000 > 0) (dailySteps.toFloat() / 12000.toFloat()).coerceIn(0f, 1f) else 0f
+        // Texto de meta y porcentaje CON DATOS PERSISTENTES
+        val progress = if (dailyGoal > 0) (dailySteps.toFloat() / dailyGoal.toFloat()).coerceIn(0f, 1f) else 0f
         val percentage = (progress * 100).toInt()
 
         Text(
-            text = "Meta: 12,000 pasos",
+            text = "Meta: ${String.format("%,d", dailyGoal)} pasos",
             fontSize = 14.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center
@@ -112,13 +125,20 @@ fun ActivityMenuScreen(
             Text(
                 text = "¡Has alcanzado el $percentage% de tu meta!",
                 fontSize = 16.sp,
-                color = Color(0xFFFF9800),
+                color = if (percentage >= 100) Color(0xFF4CAF50) else Color(0xFFFF9800),
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        } else {
+            Text(
+                text = "¡Comienza a caminar!",
+                fontSize = 16.sp,
+                color = Color.Gray,
                 textAlign = TextAlign.Center
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Botones de selección de actividad
         Row(
@@ -142,19 +162,20 @@ fun ActivityMenuScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Gráfico semanal limpio
-        WeeklyStepsChart(
+        // GRÁFICO SEMANAL FUNCIONAL CORREGIDO
+        WeeklyStepsChartFunctional(
             weeklyData = weeklySteps,
+            currentDaySteps = dailySteps, // Pasar pasos actuales
             modifier = Modifier
                 .fillMaxWidth()
-                .height(160.dp)
+                .height(220.dp) // Más altura para mejor visualización
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón de iniciar actividad (solo visible si hay actividad seleccionada)
+        // Botón de iniciar actividad
         selectedActivity?.let { activity ->
             Button(
                 onClick = {
@@ -201,11 +222,13 @@ fun ActivityMenuScreen(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
 @Composable
-private fun DailyStepsCircle(
+private fun DailyStepsCirclePersistent(
     steps: Int,
     goal: Int,
     modifier: Modifier = Modifier
@@ -254,7 +277,7 @@ private fun DailyStepsCircle(
                 }
             }
 
-            // Contenido del círculo - SOLO lo esencial
+            // Contenido del círculo - MOSTRAR DATOS PERSISTENTES
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -309,12 +332,48 @@ private fun ActivitySelectionButton(
 }
 
 @Composable
-private fun WeeklyStepsChart(
+private fun WeeklyStepsChartFunctional(
     weeklyData: List<Int>,
+    currentDaySteps: Int,
     modifier: Modifier = Modifier
 ) {
-    val days = listOf("Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom")
-    val maxSteps = weeklyData.maxOrNull()?.takeIf { it > 0 } ?: 10000
+    // Días de la semana ABREVIADOS
+    val days = listOf("Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do")
+
+    // SOLO DATOS REALES - SIN SIMULACIÓN
+    val realWeeklyData = remember(weeklyData, currentDaySteps) {
+        val data = weeklyData.toMutableList()
+
+        // Asegurar que tenemos 7 días
+        while (data.size < 7) {
+            data.add(0)
+        }
+
+        // Obtener día actual (0 = Lunes, 6 = Domingo)
+        val calendar = java.util.Calendar.getInstance()
+        val currentDay = when(calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+            java.util.Calendar.MONDAY -> 0
+            java.util.Calendar.TUESDAY -> 1
+            java.util.Calendar.WEDNESDAY -> 2
+            java.util.Calendar.THURSDAY -> 3
+            java.util.Calendar.FRIDAY -> 4
+            java.util.Calendar.SATURDAY -> 5
+            java.util.Calendar.SUNDAY -> 6
+            else -> 0
+        }
+
+        // SOLO asegurar que el día actual tenga los pasos correctos
+        data[currentDay] = currentDaySteps
+
+        // NO SIMULAR DATOS - usar solo datos reales del StepViewModel
+        println("📊 Datos REALES del gráfico - Día actual: $currentDay, Pasos hoy: $currentDaySteps")
+        println("📊 Array REAL completo: $data")
+
+        data
+    }
+
+    // Calcular máximo solo de datos reales (no ceros)
+    val maxSteps = realWeeklyData.filter { it > 0 }.maxOrNull() ?: 1000
 
     Card(
         modifier = modifier,
@@ -323,7 +382,7 @@ private fun WeeklyStepsChart(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
             Text(
                 text = "Pasos Semanales",
@@ -332,62 +391,109 @@ private fun WeeklyStepsChart(
                 color = Color.Black
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Contenedor para las barras
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp),
+                    .height(120.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Bottom
             ) {
                 repeat(7) { index ->
-                    val steps = weeklyData.getOrNull(index) ?: 0
+                    val steps = realWeeklyData.getOrNull(index) ?: 0
                     val barHeight = if (steps > 0 && maxSteps > 0) {
-                        (steps.toFloat() / maxSteps * 100).dp.coerceAtLeast(4.dp)
+                        (steps.toFloat() / maxSteps * 100).dp.coerceAtLeast(8.dp)
                     } else {
-                        4.dp
+                        8.dp // Altura mínima para días sin datos
                     }
+
+                    // Obtener día actual para destacarlo
+                    val calendar = java.util.Calendar.getInstance()
+                    val currentDay = when(calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+                        java.util.Calendar.MONDAY -> 0
+                        java.util.Calendar.TUESDAY -> 1
+                        java.util.Calendar.WEDNESDAY -> 2
+                        java.util.Calendar.THURSDAY -> 3
+                        java.util.Calendar.FRIDAY -> 4
+                        java.util.Calendar.SATURDAY -> 5
+                        java.util.Calendar.SUNDAY -> 6
+                        else -> 0
+                    }
+
+                    val isToday = index == currentDay
 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Bottom
                     ) {
-                        // Valor de pasos (solo si hay pasos)
+                        // Valor de pasos SOLO si hay datos reales
                         if (steps > 0) {
                             Text(
                                 text = if (steps >= 1000) "${steps / 1000}k" else steps.toString(),
                                 fontSize = 10.sp,
-                                color = Color.Gray
+                                color = if (isToday) Color(0xFF4CAF50) else Color.Gray,
+                                fontWeight = if (isToday) FontWeight.Bold else FontWeight.Medium
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                         } else {
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
 
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        // Barra
+                        // Barra SOLO con datos reales
                         Box(
                             modifier = Modifier
-                                .width(20.dp)
+                                .width(28.dp)
                                 .height(barHeight)
                                 .background(
-                                    color = if (steps > 0) Color(0xFF4CAF50) else Color(0xFFE0E0E0),
-                                    shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
+                                    color = when {
+                                        isToday && steps > 0 -> Color(0xFF4CAF50) // Verde para hoy con pasos
+                                        isToday && steps == 0 -> Color(0xFF81C784).copy(alpha = 0.3f) // Verde claro para hoy sin pasos
+                                        steps > 0 -> Color(0xFF81C784) // Verde claro para otros días con pasos
+                                        else -> Color(0xFFE0E0E0) // Gris para días sin datos
+                                    },
+                                    shape = RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)
                                 )
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         // Día de la semana
                         Text(
                             text = days[index],
                             fontSize = 12.sp,
-                            color = Color.Gray
+                            color = if (isToday) Color(0xFF4CAF50) else Color.Gray,
+                            fontWeight = if (isToday) FontWeight.Bold else FontWeight.Medium
                         )
                     }
                 }
+            }
+
+            // Información adicional SOLO con datos reales
+            Spacer(modifier = Modifier.height(12.dp))
+
+            val totalWeeklySteps = realWeeklyData.sum()
+            val daysWithRealData = realWeeklyData.count { it > 0 }
+            val averageSteps = if (daysWithRealData > 0) {
+                totalWeeklySteps / daysWithRealData
+            } else 0
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Total: ${String.format("%,d", totalWeeklySteps)}",
+                    fontSize = 12.sp,
+                    color = Color(0xFF666666)
+                )
+                Text(
+                    text = "Promedio: ${String.format("%,d", averageSteps)}",
+                    fontSize = 12.sp,
+                    color = Color(0xFF666666)
+                )
             }
         }
     }
