@@ -5,14 +5,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wayneenterprises.habitum.sensors.AccelerometerSensorManager
@@ -31,6 +39,23 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
+// 🎨 Paleta de colores mejorada
+object RunMapColors {
+    val PrimaryPink = Color(0xFFE91E63)
+    val SecondaryBlue = Color(0xFF2196F3)
+    val AccentPurple = Color(0xFF9C27B0)
+    val SoftCyan = Color(0xFF00BCD4)
+    val WarmOrange = Color(0xFFFF9800)
+    val SuccessGreen = Color(0xFF4CAF50)
+
+    // Gradientes
+    val PrimaryGradient = listOf(Color(0xFFE91E63), Color(0xFFAD1457))
+    val SecondaryGradient = listOf(Color(0xFF2196F3), Color(0xFF1565C0))
+    val SuccessGradient = listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))
+    val SetupGradient = listOf(Color(0xFF9C27B0), Color(0xFF6A1B9A))
+    val BackgroundGradient = listOf(Color(0xFFF8F9FA), Color(0xFFE3F2FD))
+}
+
 enum class RunState { SETUP, READY, RUNNING, FINISHED }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -46,7 +71,6 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
     val startMarker = remember { mutableStateOf<Marker?>(null) }
     val endMarker = remember { mutableStateOf<Marker?>(null) }
 
-    // 🔥 NUEVA VARIABLE: Para controlar si ya centramos el mapa una vez
     val hasInitiallycenteredMap = remember { mutableStateOf(false) }
 
     val runState by viewModel.runState
@@ -128,192 +152,427 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
         }
     }
 
-    // 🔥 RESETEAR el flag cuando se reinicia la carrera
     LaunchedEffect(runState) {
         if (runState == RunState.SETUP) {
             hasInitiallycenteredMap.value = false
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        when (runState) {
-                            RunState.SETUP -> "📍 Selecciona tu destino"
-                            RunState.READY -> "✅ ¡Listo para correr!"
-                            RunState.RUNNING -> "🏃‍♂️ Corriendo..."
-                            RunState.FINISHED -> "🎉 ¡Completado!"
-                        }
-                    )
-                }
+    // 🎨 NUEVO DISEÑO CON GRADIENTES Y COLORES MEJORADOS
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(RunMapColors.BackgroundGradient)
             )
-        }
-    ) { padding ->
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
+            modifier = Modifier.fillMaxSize()
         ) {
-            if (runState == RunState.SETUP && currentLocation != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text("🎯 Tu carrera comenzará desde tu ubicación actual", color = MaterialTheme.colorScheme.onPrimaryContainer)
-                        Text("Toca en el mapa para marcar tu destino", color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
-                    }
-                }
-            }
+            // 🎨 Header mejorado con gradiente
+            ModernRunHeader(runState = runState)
 
-            if (isLoadingRoute) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                ) {
-                    Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.Center) {
-                        CircularProgressIndicator(modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("🗺️ Calculando ruta por calles...")
-                    }
-                }
-            }
-
-            routeLoadError?.let {
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                ) {
-                    Text("⚠️ $it. Usando ruta alternativa.", modifier = Modifier.padding(12.dp), color = MaterialTheme.colorScheme.onErrorContainer)
-                }
-            }
-
-            RunStatusCard(
-                runState = runState,
-                isSelectingStart = false,
-                elapsedTime = viewModel.elapsedTime.value,
-                totalDistance = viewModel.totalDistance.value,
-                stepCount = viewModel.stepCount.value
-            )
-
-            RunControlButtons(
-                viewModel = viewModel,
-                mapView = mapView.value,
-                polyline = routePolyline
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth().height(450.dp).padding(8.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AndroidView(
-                    factory = { ctx ->
-                        MapView(ctx).apply {
-                            setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
-                            setMultiTouchControls(true)
-                            controller.setZoom(15.0)
-                            setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
-                            controller.setCenter(currentLocation ?: GeoPoint(13.7, -89.2))
-                            mapView.value = this
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                    update = { view ->
-                        view.overlays.clear()
+                // 🎨 Mensaje de estado mejorado
+                EnhancedStatusMessage(
+                    runState = runState,
+                    isSelectingDestination = viewModel.isSelectingDestination.value,
+                    isLoadingRoute = isLoadingRoute,
+                    routeLoadError = routeLoadError,
+                    currentLocation = currentLocation
+                )
 
-                        if (runState == RunState.SETUP) {
-                            view.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
-                                override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                                    handleDestinationClick(context, p, viewModel, mapView.value, endMarker)
-                                    return true
-                                }
+                // Status Card con nuevo diseño
+                RunStatusCard(
+                    runState = runState,
+                    isSelectingStart = false,
+                    elapsedTime = viewModel.elapsedTime.value,
+                    totalDistance = viewModel.totalDistance.value,
+                    stepCount = viewModel.stepCount.value
+                )
 
-                                override fun longPressHelper(p: GeoPoint): Boolean = false
-                            }))
-                        }
+                // Botones de control mejorados
+                RunControlButtons(
+                    viewModel = viewModel,
+                    mapView = mapView.value,
+                    polyline = routePolyline
+                )
 
-                        if (runState != RunState.SETUP && viewModel.plannedRoute.isNotEmpty()) {
-                            plannedRoutePolyline.setPoints(viewModel.plannedRoute)
-                            plannedRoutePolyline.outlinePaint.color = android.graphics.Color.parseColor("#2196F3")
-                            plannedRoutePolyline.outlinePaint.strokeWidth = 10f
-                            view.overlays.add(plannedRoutePolyline)
-                        }
-
-                        if ((runState == RunState.RUNNING || runState == RunState.FINISHED) && viewModel.routePoints.isNotEmpty()) {
-                            routePolyline.setPoints(viewModel.routePoints)
-                            routePolyline.outlinePaint.color = if (runState == RunState.FINISHED) android.graphics.Color.parseColor("#4CAF50") else android.graphics.Color.parseColor("#FF5722")
-                            routePolyline.outlinePaint.strokeWidth = 12f
-                            view.overlays.add(routePolyline)
-                        }
-
-                        startMarker.value?.let { view.overlays.add(it) }
-                        endMarker.value?.let { view.overlays.add(it) }
-
-                        // 🔥 CAMBIO IMPORTANTE: Solo mostrar marcador de ubicación actual durante RUNNING, NO en FINISHED
-                        if (runState == RunState.RUNNING && currentLocation != null) {
-                            val currentMarker = Marker(view).apply {
-                                position = currentLocation!!
-                                title = "Tu ubicación"
-                                icon = createCurrentLocationMarker(context)
-                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                            }
-                            view.overlays.add(currentMarker)
-                        }
-
-                        when (runState) {
-                            RunState.SETUP -> {
-                                // 🔥 CENTRAR SOLO UNA VEZ cuando llegue la ubicación por primera vez
-                                if (!hasInitiallycenteredMap.value && currentLocation != null) {
-                                    currentLocation?.let { location ->
-                                        view.controller.setCenter(location)
-                                        view.controller.setZoom(15.0)
-                                        hasInitiallycenteredMap.value = true
-                                        println("🗺️ Mapa centrado por primera vez en ubicación actual")
-                                    }
-                                }
-                                // NO hacer nada más - el usuario puede mover el mapa libremente
-                            }
-
-                            RunState.READY -> {
-                                if (viewModel.startPoint.value != null && viewModel.endPoint.value != null) {
-                                    val bounds = org.osmdroid.util.BoundingBox.fromGeoPoints(listOf(viewModel.startPoint.value!!, viewModel.endPoint.value!!))
-                                    view.zoomToBoundingBox(bounds, true, 100)
-                                }
-                            }
-
-                            RunState.RUNNING -> {
-                                currentLocation?.let {
-                                    view.controller.setCenter(it)
-                                    view.controller.setZoom(17.0)
-                                }
-                            }
-
-                            RunState.FINISHED -> {
-                                // 🔥 MOSTRAR SOLO LA RUTA COMPLETADA sin marcador de ubicación actual
-                                if (viewModel.routePoints.isNotEmpty()) {
-                                    val bounds = org.osmdroid.util.BoundingBox.fromGeoPoints(viewModel.routePoints)
-                                    view.zoomToBoundingBox(bounds, true, 100)
-                                    if (view.zoomLevelDouble < 14.0) {
-                                        view.controller.setZoom(14.0)
-                                    }
-                                }
-                            }
-                        }
-
-                        view.invalidate()
-                    }
+                // 🎨 Mapa con nuevo contenedor
+                EnhancedMapContainer(
+                    viewModel = viewModel,
+                    mapView = mapView,
+                    routePolyline = routePolyline,
+                    plannedRoutePolyline = plannedRoutePolyline,
+                    startMarker = startMarker,
+                    endMarker = endMarker,
+                    hasInitiallycenteredMap = hasInitiallycenteredMap,
+                    runState = runState,
+                    currentLocation = currentLocation,
+                    context = context
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
+@Composable
+private fun ModernRunHeader(runState: RunState) {
+    val statusText = when (runState) {
+        RunState.SETUP -> "🎯 Configura tu Ruta"
+        RunState.READY -> "✅ ¡Todo Listo!"
+        RunState.RUNNING -> "🏃‍♂️ En Marcha"
+        RunState.FINISHED -> "🎉 ¡Completado!"
+    }
+
+    val gradient = when (runState) {
+        RunState.SETUP -> RunMapColors.SetupGradient
+        RunState.READY -> RunMapColors.SecondaryGradient
+        RunState.RUNNING -> RunMapColors.PrimaryGradient
+        RunState.FINISHED -> RunMapColors.SuccessGradient
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp),
+        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Brush.horizontalGradient(gradient))
+                .padding(24.dp)
+        ) {
+            Text(
+                text = statusText,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+    }
+}
+
+@Composable
+private fun EnhancedStatusMessage(
+    runState: RunState,
+    isSelectingDestination: Boolean,
+    isLoadingRoute: Boolean,
+    routeLoadError: String?,
+    currentLocation: GeoPoint?
+) {
+    when {
+        runState == RunState.SETUP && currentLocation != null -> {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(RunMapColors.AccentPurple.copy(alpha = 0.1f), RunMapColors.SoftCyan.copy(alpha = 0.1f))
+                            )
+                        )
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "🎯 Tu Punto de Partida",
+                            color = RunMapColors.AccentPurple,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Ubicación actual confirmada. Toca en el mapa para seleccionar tu destino.",
+                            color = RunMapColors.AccentPurple.copy(alpha = 0.8f),
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        isLoadingRoute -> {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(RunMapColors.SecondaryBlue.copy(alpha = 0.1f), RunMapColors.SoftCyan.copy(alpha = 0.1f))
+                            )
+                        )
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = RunMapColors.SecondaryBlue,
+                            strokeWidth = 3.dp
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "🗺️ Calculando Ruta",
+                                color = RunMapColors.SecondaryBlue,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Buscando el mejor camino por las calles...",
+                                color = RunMapColors.SecondaryBlue.copy(alpha = 0.8f),
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        routeLoadError != null -> {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(RunMapColors.WarmOrange.copy(alpha = 0.1f), RunMapColors.PrimaryPink.copy(alpha = 0.1f))
+                            )
+                        )
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "⚠️ Ruta Alternativa",
+                            color = RunMapColors.WarmOrange,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Usando ruta directa. La funcionalidad completa está disponible.",
+                            color = RunMapColors.WarmOrange.copy(alpha = 0.8f),
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnhancedMapContainer(
+    viewModel: RunMapViewModel,
+    mapView: MutableState<MapView?>,
+    routePolyline: Polyline,
+    plannedRoutePolyline: Polyline,
+    startMarker: MutableState<Marker?>,
+    endMarker: MutableState<Marker?>,
+    hasInitiallycenteredMap: MutableState<Boolean>,
+    runState: RunState,
+    currentLocation: GeoPoint?,
+    context: Context
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(480.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(20.dp))
+        ) {
+            AndroidView(
+                factory = { ctx ->
+                    MapView(ctx).apply {
+                        setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK)
+                        setMultiTouchControls(true)
+                        controller.setZoom(15.0)
+                        setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+                        controller.setCenter(currentLocation ?: GeoPoint(13.7, -89.2))
+                        mapView.value = this
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+                update = { view ->
+                    updateMapWithNewColors(
+                        view, viewModel, runState, hasInitiallycenteredMap,
+                        currentLocation, context, startMarker, endMarker,
+                        plannedRoutePolyline, routePolyline
+                    )
+                }
+            )
+
+            // 🎨 Overlay decorativo en las esquinas
+            DecorativeMapOverlay()
+        }
+    }
+}
+
+@Composable
+private fun DecorativeMapOverlay() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Esquina superior izquierda
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(RunMapColors.PrimaryPink.copy(alpha = 0.3f), Color.Transparent)
+                    ),
+                    shape = RoundedCornerShape(topStart = 20.dp)
+                )
+        )
+
+        // Esquina inferior derecha
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(RunMapColors.SecondaryBlue.copy(alpha = 0.3f), Color.Transparent)
+                    ),
+                    shape = RoundedCornerShape(bottomEnd = 20.dp)
+                )
+                .align(Alignment.BottomEnd)
+        )
+    }
+}
+
+// 🎨 Función para actualizar el mapa con nuevos colores
+private fun updateMapWithNewColors(
+    view: MapView,
+    viewModel: RunMapViewModel,
+    runState: RunState,
+    hasInitiallycenteredMap: MutableState<Boolean>,
+    currentLocation: GeoPoint?,
+    context: Context,
+    startMarker: MutableState<Marker?>,
+    endMarker: MutableState<Marker?>,
+    plannedRoutePolyline: Polyline,
+    routePolyline: Polyline
+) {
+    view.overlays.clear()
+
+    // Agregar eventos de mapa solo si estamos en modo setup
+    if (runState == RunState.SETUP) {
+        view.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                handleDestinationClick(context, p, viewModel, view, endMarker)
+                return true
+            }
+            override fun longPressHelper(p: GeoPoint): Boolean = false
+        }))
+    }
+
+    // 🎨 Ruta planificada con nuevos colores
+    if (runState != RunState.SETUP && viewModel.plannedRoute.isNotEmpty()) {
+        plannedRoutePolyline.setPoints(viewModel.plannedRoute)
+        plannedRoutePolyline.outlinePaint.apply {
+            color = android.graphics.Color.parseColor("#2196F3") // Azul vibrante
+            strokeWidth = 12f
+            pathEffect = android.graphics.DashPathEffect(floatArrayOf(25f, 15f), 0f)
+            alpha = 180
+        }
+        view.overlays.add(plannedRoutePolyline)
+    }
+
+    // 🎨 Ruta recorrida con gradiente
+    if ((runState == RunState.RUNNING || runState == RunState.FINISHED) && viewModel.routePoints.isNotEmpty()) {
+        routePolyline.setPoints(viewModel.routePoints)
+        routePolyline.outlinePaint.apply {
+            color = if (runState == RunState.FINISHED)
+                android.graphics.Color.parseColor("#4CAF50") // Verde éxito
+            else
+                android.graphics.Color.parseColor("#E91E63") // Rosa vibrante
+            strokeWidth = 14f
+            alpha = 255
+        }
+        view.overlays.add(routePolyline)
+    }
+
+    startMarker.value?.let { view.overlays.add(it) }
+    endMarker.value?.let { view.overlays.add(it) }
+
+    // Marcador de ubicación actual con nuevo diseño
+    if (runState == RunState.RUNNING && currentLocation != null) {
+        val currentMarker = Marker(view).apply {
+            position = currentLocation
+            title = "Tu ubicación"
+            icon = createEnhancedCurrentLocationMarker(context)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        }
+        view.overlays.add(currentMarker)
+    }
+
+    // Lógica de centrado del mapa (sin cambios)
+    when (runState) {
+        RunState.SETUP -> {
+            if (!hasInitiallycenteredMap.value && currentLocation != null) {
+                currentLocation.let { location ->
+                    view.controller.setCenter(location)
+                    view.controller.setZoom(15.0)
+                    hasInitiallycenteredMap.value = true
+                }
+            }
+        }
+        RunState.READY -> {
+            if (viewModel.startPoint.value != null && viewModel.endPoint.value != null) {
+                val bounds = org.osmdroid.util.BoundingBox.fromGeoPoints(listOf(viewModel.startPoint.value!!, viewModel.endPoint.value!!))
+                view.zoomToBoundingBox(bounds, true, 100)
+            }
+        }
+        RunState.RUNNING -> {
+            currentLocation?.let {
+                view.controller.setCenter(it)
+                view.controller.setZoom(17.0)
+            }
+        }
+        RunState.FINISHED -> {
+            if (viewModel.routePoints.isNotEmpty()) {
+                val bounds = org.osmdroid.util.BoundingBox.fromGeoPoints(viewModel.routePoints)
+                view.zoomToBoundingBox(bounds, true, 100)
+                if (view.zoomLevelDouble < 14.0) {
+                    view.controller.setZoom(14.0)
+                }
+            }
+        }
+    }
+
+    view.invalidate()
+}
+
+// Resto de funciones auxiliares...
 @SuppressLint("MissingPermission")
 private fun startLocationUpdates(
     context: Context,
@@ -333,7 +592,6 @@ private fun startLocationUpdates(
     client.requestLocationUpdates(request, callback, Looper.getMainLooper())
 }
 
-// 🔥 MARCADOR DE INICIO MEJORADO - Diseño más atractivo
 fun showStartMarker(
     context: Context,
     location: GeoPoint,
@@ -344,14 +602,13 @@ fun showStartMarker(
         val marker = Marker(map).apply {
             position = location
             title = "🚀 Punto de Inicio"
-            icon = createStartMarker(context)
+            icon = createEnhancedStartMarker(context)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         }
         markerState.value = marker
     }
 }
 
-// 🔥 MARCADOR DE DESTINO MEJORADO - Diseño más atractivo
 fun handleDestinationClick(
     context: Context,
     location: GeoPoint,
@@ -359,12 +616,8 @@ fun handleDestinationClick(
     mapView: MapView?,
     markerState: MutableState<Marker?>
 ) {
-    println("🎯 Destino seleccionado: ${location.latitude}, ${location.longitude}")
-
-    // ✅ ASEGURAR que tenemos punto de inicio antes de continuar
     if (viewModel.startPoint.value == null) {
         viewModel.setStartPointAutomatically()
-        println("📍 Punto de inicio configurado automáticamente")
     }
 
     viewModel.endPoint.value = location
@@ -374,23 +627,19 @@ fun handleDestinationClick(
         val marker = Marker(map).apply {
             position = location
             title = "🏁 Meta / Destino"
-            icon = createFinishMarker(context)
+            icon = createEnhancedFinishMarker(context)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         }
         markerState.value = marker
     }
 
-    // ✅ CALCULAR RUTA solo si tenemos ambos puntos
     if (viewModel.startPoint.value != null && viewModel.endPoint.value != null) {
-        println("🗺️ Calculando ruta desde inicio hasta destino...")
         viewModel.calculateRealRouteByStreets()
-    } else {
-        println("⚠️ Error: Faltan puntos para calcular ruta")
     }
 }
 
-// 🔥 NUEVO: Crear marcador de inicio personalizado con diseño atractivo
-fun createStartMarker(context: Context): android.graphics.drawable.Drawable {
+// 🎨 Marcadores mejorados con la nueva paleta de colores
+fun createEnhancedStartMarker(context: Context): android.graphics.drawable.Drawable {
     val size = 70
     val paint = android.graphics.Paint().apply {
         isAntiAlias = true
@@ -401,23 +650,23 @@ fun createStartMarker(context: Context): android.graphics.drawable.Drawable {
     val bitmap = android.graphics.Bitmap.createBitmap(size, size + 25, android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
 
-    // Sombra del marcador
+    // Sombra
     paint.color = android.graphics.Color.BLACK
     paint.alpha = 60
     canvas.drawCircle(size / 2f + 3, size / 2f + 3, size / 2f - 8, paint)
 
-    // Círculo principal verde brillante
-    paint.color = android.graphics.Color.parseColor("#4CAF50") // Verde vibrante
+    // Círculo principal con gradiente rosa-morado
+    paint.color = android.graphics.Color.parseColor("#E91E63") // Rosa primario
     paint.alpha = 255
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Borde blanco grueso
+    // Borde blanco más grueso
     paint.color = android.graphics.Color.WHITE
     paint.style = android.graphics.Paint.Style.STROKE
     paint.strokeWidth = 6f
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Ícono de "Play" / Inicio
+    // Ícono de play mejorado
     paint.style = android.graphics.Paint.Style.FILL
     paint.color = android.graphics.Color.WHITE
     val playPath = android.graphics.Path().apply {
@@ -428,8 +677,8 @@ fun createStartMarker(context: Context): android.graphics.drawable.Drawable {
     }
     canvas.drawPath(playPath, paint)
 
-    // Punta del marcador (triángulo verde)
-    paint.color = android.graphics.Color.parseColor("#4CAF50")
+    // Punta del marcador
+    paint.color = android.graphics.Color.parseColor("#E91E63")
     val trianglePath = android.graphics.Path().apply {
         moveTo(size / 2f, size.toFloat())
         lineTo(size / 2f - 12, size.toFloat() - 18)
@@ -438,17 +687,10 @@ fun createStartMarker(context: Context): android.graphics.drawable.Drawable {
     }
     canvas.drawPath(trianglePath, paint)
 
-    // Texto "START" debajo
-    paint.color = android.graphics.Color.parseColor("#2E7D32")
-    paint.textSize = 12f
-    paint.style = android.graphics.Paint.Style.FILL
-    canvas.drawText("START", size / 2f, size + 20f, paint)
-
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }
 
-// 🔥 NUEVO: Crear marcador de meta personalizado con diseño atractivo
-fun createFinishMarker(context: Context): android.graphics.drawable.Drawable {
+fun createEnhancedFinishMarker(context: Context): android.graphics.drawable.Drawable {
     val size = 70
     val paint = android.graphics.Paint().apply {
         isAntiAlias = true
@@ -459,23 +701,23 @@ fun createFinishMarker(context: Context): android.graphics.drawable.Drawable {
     val bitmap = android.graphics.Bitmap.createBitmap(size, size + 25, android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
 
-    // Sombra del marcador
+    // Sombra
     paint.color = android.graphics.Color.BLACK
     paint.alpha = 60
     canvas.drawCircle(size / 2f + 3, size / 2f + 3, size / 2f - 8, paint)
 
-    // Círculo principal rojo brillante
-    paint.color = android.graphics.Color.parseColor("#F44336") // Rojo vibrante
+    // Círculo principal azul vibrante
+    paint.color = android.graphics.Color.parseColor("#2196F3")
     paint.alpha = 255
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Borde blanco grueso
+    // Borde blanco
     paint.color = android.graphics.Color.WHITE
     paint.style = android.graphics.Paint.Style.STROKE
     paint.strokeWidth = 6f
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Bandera a cuadros (efecto finish line)
+    // Bandera a cuadros mejorada
     paint.style = android.graphics.Paint.Style.FILL
     val squareSize = 4f
     for (i in 0..6) {
@@ -491,8 +733,8 @@ fun createFinishMarker(context: Context): android.graphics.drawable.Drawable {
         }
     }
 
-    // Punta del marcador (triángulo rojo)
-    paint.color = android.graphics.Color.parseColor("#F44336")
+    // Punta del marcador
+    paint.color = android.graphics.Color.parseColor("#2196F3")
     val trianglePath = android.graphics.Path().apply {
         moveTo(size / 2f, size.toFloat())
         lineTo(size / 2f - 12, size.toFloat() - 18)
@@ -501,18 +743,11 @@ fun createFinishMarker(context: Context): android.graphics.drawable.Drawable {
     }
     canvas.drawPath(trianglePath, paint)
 
-    // Texto "FINISH" debajo
-    paint.color = android.graphics.Color.parseColor("#C62828")
-    paint.textSize = 12f
-    paint.style = android.graphics.Paint.Style.FILL
-    canvas.drawText("FINISH", size / 2f, size + 20f, paint)
-
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }
 
-// Crea un marcador para la ubicación actual (círculo azul con blanco) - SIN CAMBIOS
-fun createCurrentLocationMarker(context: Context): android.graphics.drawable.Drawable {
-    val size = 40
+fun createEnhancedCurrentLocationMarker(context: Context): android.graphics.drawable.Drawable {
+    val size = 50
     val paint = android.graphics.Paint().apply {
         isAntiAlias = true
     }
@@ -520,16 +755,25 @@ fun createCurrentLocationMarker(context: Context): android.graphics.drawable.Dra
     val bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
 
-    paint.color = android.graphics.Color.parseColor("#4285F4")
-    paint.alpha = 100
+    // Anillo exterior con color de la paleta
+    paint.color = android.graphics.Color.parseColor("#E91E63") // Rosa primario
+    paint.alpha = 120
     canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
 
+    // Anillo medio
     paint.color = android.graphics.Color.WHITE
     paint.alpha = 255
-    canvas.drawCircle(size / 2f, size / 2f, size / 4f, paint)
+    canvas.drawCircle(size / 2f, size / 2f, size / 3f, paint)
 
-    paint.color = android.graphics.Color.parseColor("#4285F4")
-    canvas.drawCircle(size / 2f, size / 2f, size / 8f, paint)
+    // Punto central
+    paint.color = android.graphics.Color.parseColor("#E91E63")
+    canvas.drawCircle(size / 2f, size / 2f, size / 6f, paint)
+
+    // Borde del punto central
+    paint.color = android.graphics.Color.WHITE
+    paint.style = android.graphics.Paint.Style.STROKE
+    paint.strokeWidth = 2f
+    canvas.drawCircle(size / 2f, size / 2f, size / 6f, paint)
 
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }

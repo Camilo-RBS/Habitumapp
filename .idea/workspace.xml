@@ -10,12 +10,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13e102cf-d85e-41bc-a7ba-f5d1e46be410" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/model/DailySteps.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/model/SupabaseDailySteps.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/repository/DailyStepsRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/componets/services/StepCounterForegroundService.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/componets/services/StepCounterService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/model/ModelExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/model/ModelExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/repository/SupabaseRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/repository/SupabaseRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/componets/maps/RunControlButtons.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/componets/maps/RunControlButtons.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/HomeScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical/ActivityMenuScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical/ActivityMenuScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical/RunMapScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical/RunMapScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical/WalkingScreen..kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/ui/screens/physical/WalkingScreen..kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/viewmodel/StepViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/wayneenterprises/habitum/viewmodel/StepViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +44,14 @@
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin File" />
+        <option value="Kotlin Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -47,23 +69,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Android App.app.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "CamiloBenitez",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/UCA/Ciclo01-2025/LabosMoviles/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/viewmodel",
-    "project.structure.last.edited": "SDK Location",
-    "project.structure.proportion": "0.17",
-    "project.structure.side.proportion": "0.0"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;CamiloBenitez&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/UCA/Ciclo01-2025/LabosMoviles/Habitumapp/app/src/main/java/com/wayneenterprises/habitum/viewmodel&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;SDK Location&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.17&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\UCA\Ciclo01-2025\LabosMoviles\Habitumapp\app\src\main\java\com\wayneenterprises\habitum\viewmodel" />
@@ -166,12 +188,12 @@
       <map>
         <entry key="com.wayneenterprises.habitum">
           <value>
-            <CheckInfo lastCheckTimestamp="1750396230675" />
+            <CheckInfo lastCheckTimestamp="1750486633929" />
           </value>
         </entry>
         <entry key="com.wayneenterprises.habitum.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1750396230666" />
+            <CheckInfo lastCheckTimestamp="1750486633929" />
           </value>
         </entry>
       </map>

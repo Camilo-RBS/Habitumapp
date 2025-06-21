@@ -1,10 +1,23 @@
 package com.wayneenterprises.habitum.ui.screens
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,8 +26,27 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -27,14 +59,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.wayneenterprises.habitum.model.*
-import com.wayneenterprises.habitum.viewmodel.*
-import com.wayneenterprises.habitum.ui.components.ScreenHeader
-import com.wayneenterprises.habitum.sensors.AccelerometerSensorManager
-import com.wayneenterprises.habitum.sensors.StepDetector
-import com.wayneenterprises.habitum.sensors.StepListener
+import com.wayneenterprises.habitum.model.Reminder
+import com.wayneenterprises.habitum.model.ReminderStatus
+import com.wayneenterprises.habitum.model.Task
+import com.wayneenterprises.habitum.model.TaskPriority
+import com.wayneenterprises.habitum.model.User
+import com.wayneenterprises.habitum.services.StepCounterService
+import com.wayneenterprises.habitum.viewmodel.AuthViewModel
+import com.wayneenterprises.habitum.viewmodel.ReminderViewModel
+import com.wayneenterprises.habitum.viewmodel.StepViewModel
+import com.wayneenterprises.habitum.viewmodel.TaskViewModel
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,44 +81,37 @@ fun HomeScreen(
     navController: NavController,
     taskViewModel: TaskViewModel = viewModel(),
     reminderViewModel: ReminderViewModel = viewModel(),
-    stepViewModel: StepViewModel = viewModel(),
+    stepViewModel: StepViewModel = StepViewModel.getInstance(), // ✅ Usar instancia singleton
     authViewModel: AuthViewModel
 ) {
     val context = LocalContext.current
 
-    // Observar datos GLOBALES
-    val tasks by taskViewModel.tasks.collectAsState()
-    val reminders by reminderViewModel.reminders.collectAsState()
-    val dailySteps by stepViewModel.dailySteps.collectAsState()
-    val dailyGoal by stepViewModel.dailyGoal.collectAsState()
-    val authState by authViewModel.uiState.collectAsState()
-
-    // CONFIGURACIÓN ÚNICA DEL DETECTOR - NO reinicializar
+    // 🔄 CONECTAR CON SERVICIO GLOBAL - SIN CONFIGURAR DETECTOR LOCAL
     LaunchedEffect(Unit) {
-        // Solo configurar si no existe ya
-        if (StepCounter.getStepDetector() == null) {
-            val stepDetector = StepDetector()
-            val accelerometerManager = AccelerometerSensorManager(context, stepDetector)
+        println("🏠 HomeScreen - Conectando con servicio global")
 
-            stepDetector.registerListener(object : StepListener {
-                override fun step(timeNs: Long) {
-                    stepViewModel.incrementDailyStep()
-                }
-            })
+        // Actualizar la referencia del ViewModel en el servicio
+        StepCounterService.updateViewModel(stepViewModel)
 
-            // Guardar referencias globales
-            StepCounter.setStepDetector(stepDetector)
-            StepCounter.setAccelerometer(accelerometerManager)
-
-            accelerometerManager.start()
-            println("🏠 HomeScreen - Detector de pasos INICIADO (primera vez)")
-        } else {
-            println("🏠 HomeScreen - Usando detector existente")
+        // Asegurar que el servicio esté activo
+        if (!StepCounterService.isActive()) {
+            println("🔄 HomeScreen - Reactivando servicio")
+            StepCounterService.startDetection()
         }
 
-        // Inicializar datos (es seguro llamar múltiples veces)
+        println("📊 HomeScreen - Status del servicio: ${StepCounterService.getStatus()}")
+
+        // Inicializar datos si es necesario
         stepViewModel.initializeDailySteps()
     }
+
+    // 🆕 OBSERVAR DATOS GLOBALES PERSISTENTES
+    val tasks by taskViewModel.tasks.collectAsState()
+    val reminders by reminderViewModel.reminders.collectAsState()
+    val dailySteps by stepViewModel.dailySteps.collectAsState() // ✅ Datos GLOBALES
+    val dailyGoal by stepViewModel.dailyGoal.collectAsState()   // ✅ Datos GLOBALES
+    val isLoading by stepViewModel.isLoading.collectAsState()   // ✅ Estado de carga
+    val authState by authViewModel.uiState.collectAsState()
 
     // Procesar datos para tareas y recordatorios
     val upcomingTasks = remember(tasks) {
@@ -90,7 +122,7 @@ fun HomeScreen(
         val nextWeek = calendar.time
 
         tasks
-            .filter { !it.isCompleted }
+
             .filter { task ->
                 task.dueDate?.let { dueDate ->
                     dueDate >= now && dueDate <= nextWeek
@@ -119,10 +151,8 @@ fun HomeScreen(
             .take(3)
     }
 
-    // USAR SCAFFOLD PARA ESTRUCTURA CORRECTA
     Scaffold(
         topBar = {
-            // HEADER PERSONALIZADO CON MENÚ DE USUARIO RESTAURADO
             CustomTopBarWithMenu(
                 user = authState.currentUser,
                 onSignOut = {
@@ -131,20 +161,51 @@ fun HomeScreen(
                 }
             )
         },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = Color(0xFFF8F9FA),
+        modifier = Modifier.fillMaxSize() // ✅ CORREGIDO: Sin padding extra
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
+                .padding(top = paddingValues.calculateTopPadding())
+                .padding(10.dp), // ✅ CORREGIDO: Volvemos al padding simple que funcionaba
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
-                // STEPS CARD CON DATOS PERSISTENTES
+                // 🔄 Indicador de carga global
+                if (isLoading) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = Color(0xFF8B5CF6)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "Sincronizando pasos...",
+                                color = Color(0xFF8B5CF6),
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            item {
+                // STEPS CARD CON DATOS GLOBALES REALES
                 StepsCardPersistent(
-                    steps = dailySteps,
-                    goal = dailyGoal,
+                    steps = dailySteps,    // ✅ Usar datos globales
+                    goal = dailyGoal,      // ✅ Usar datos globales
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -250,17 +311,22 @@ fun HomeScreen(
                     }
                 }
             }
+
+            // ✅ CORREGIDO: Espaciado final para scroll completo
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
     }
 }
 
+// ✅ FUNCIÓN CORREGIDA: CustomTopBarWithMenu con avatar centrado correctamente
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomTopBarWithMenu(
     user: User?,
     onSignOut: () -> Unit
 ) {
-    // Estado para controlar el menú desplegable
     var showDropdownMenu by remember { mutableStateOf(false) }
 
     TopAppBar(
@@ -280,11 +346,14 @@ private fun CustomTopBarWithMenu(
             }
         },
         actions = {
-            Box {
+            // ✅ CORREGIDO: Contenedor con padding para centrar el avatar correctamente
+            Box(
+                modifier = Modifier.padding(end = 16.dp) // Separación del borde derecho
+            ) {
                 // Avatar del usuario (clickeable para mostrar menú)
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(42.dp) // Tamaño ligeramente aumentado para mejor balance
                         .background(
                             Color.White.copy(alpha = 0.2f),
                             CircleShape
@@ -297,7 +366,7 @@ private fun CustomTopBarWithMenu(
                         Text(
                             text = user.name.take(1).uppercase(),
                             color = Color.White,
-                            fontSize = 16.sp,
+                            fontSize = 18.sp, // Texto más grande para mejor balance
                             fontWeight = FontWeight.Bold
                         )
                     } else {
@@ -311,10 +380,13 @@ private fun CustomTopBarWithMenu(
                     }
                 }
 
-                // MENÚ DESPLEGABLE RESTAURADO
+                // MENÚ DESPLEGABLE MEJORADO
                 DropdownMenu(
                     expanded = showDropdownMenu,
-                    onDismissRequest = { showDropdownMenu = false }
+                    onDismissRequest = { showDropdownMenu = false },
+                    modifier = Modifier.background(
+                        Color.White
+                    )
                 ) {
                     // Información del usuario
                     if (user != null) {
@@ -324,7 +396,8 @@ private fun CustomTopBarWithMenu(
                             Text(
                                 text = user.name,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
+                                fontSize = 16.sp,
+                                color = Color.Black
                             )
                             Text(
                                 text = user.email,
@@ -332,13 +405,29 @@ private fun CustomTopBarWithMenu(
                                 color = Color.Gray
                             )
                         }
-                        Divider()
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = Color.Gray.copy(alpha = 0.2f)
+                        )
                     }
 
-                    // Opción de cerrar sesión
+                    // Opción de cerrar sesión MEJORADA
                     DropdownMenuItem(
                         text = {
-                            Text("Cerrar sesión")
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "🚪",
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                                Text(
+                                    text = "Cerrar sesión",
+                                    color = Color(0xFF8B5CF6),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         },
                         onClick = {
                             showDropdownMenu = false
@@ -355,10 +444,11 @@ private fun CustomTopBarWithMenu(
             Brush.horizontalGradient(
                 colors = listOf(Color(0xFF8B5CF6), Color(0xFFEC4899))
             )
-        )
+        ) // ✅ CORREGIDO: Sin statusBarsPadding que causaba conflictos
     )
 }
 
+// ✅ STEPS CARD CORREGIDA - FUNCIONA CON DATOS GLOBALES
 @Composable
 private fun StepsCardPersistent(
     steps: Int,
@@ -433,7 +523,7 @@ private fun StepsCardPersistent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // MOSTRAR DATOS PERSISTENTES
+                // ✅ MOSTRAR DATOS GLOBALES REALES
                 Text(
                     text = String.format("%,d", steps),
                     fontSize = 32.sp,

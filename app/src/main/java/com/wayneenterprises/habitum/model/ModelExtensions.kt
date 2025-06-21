@@ -128,4 +128,5 @@ fun User.toUserInsertWithAuthId(): UserInsertWithAuthId {
         email = email,
         userType = userType
     )
+
 }
