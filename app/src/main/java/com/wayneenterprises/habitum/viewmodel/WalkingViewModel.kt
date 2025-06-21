@@ -22,7 +22,7 @@ class WalkingViewModel : ViewModel() {
     val uiState: StateFlow<WalkingUiState> = _uiState.asStateFlow()
 
     private var pausedTime: Long = 0L
-    private val stepLength = 0.8 // metros por paso (promedio)
+    private val stepLength = 0.8
 
     init {
         start()
@@ -31,7 +31,7 @@ class WalkingViewModel : ViewModel() {
     fun incrementStep() {
         val currentState = _uiState.value
         val newSteps = currentState.steps + 1
-        val newDistance = (newSteps * stepLength) / 1000.0 // convertir a km
+        val newDistance = (newSteps * stepLength) / 1000.0
 
         _uiState.value = currentState.copy(
             steps = newSteps,
@@ -76,10 +76,6 @@ class WalkingViewModel : ViewModel() {
         )
     }
 
-    fun reset() {
-        pausedTime = 0L
-        _uiState.value = WalkingUiState()
-    }
 
     fun updateTime() {
         val currentState = _uiState.value
@@ -105,11 +101,9 @@ class WalkingViewModel : ViewModel() {
         val currentState = _uiState.value
         val newData = currentState.progressData.toMutableList()
 
-        // Simular datos de progreso basados en pasos
         val progressValue = (currentState.steps % 100).toFloat()
         newData.add(progressValue)
 
-        // Mantener solo los últimos 50 puntos de datos
         if (newData.size > 50) {
             newData.removeAt(0)
         }

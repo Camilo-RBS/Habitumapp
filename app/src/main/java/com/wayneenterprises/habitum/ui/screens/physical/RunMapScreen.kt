@@ -158,7 +158,6 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
         }
     }
 
-    // 🎨 NUEVO DISEÑO CON GRADIENTES Y COLORES MEJORADOS
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -169,7 +168,6 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // 🎨 Header mejorado con gradiente
             ModernRunHeader(runState = runState)
 
             Column(
@@ -179,7 +177,6 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // 🎨 Mensaje de estado mejorado
                 EnhancedStatusMessage(
                     runState = runState,
                     isSelectingDestination = viewModel.isSelectingDestination.value,
@@ -188,7 +185,6 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
                     currentLocation = currentLocation
                 )
 
-                // Status Card con nuevo diseño
                 RunStatusCard(
                     runState = runState,
                     isSelectingStart = false,
@@ -197,14 +193,12 @@ fun RunMapScreen(viewModel: RunMapViewModel = viewModel()) {
                     stepCount = viewModel.stepCount.value
                 )
 
-                // Botones de control mejorados
                 RunControlButtons(
                     viewModel = viewModel,
                     mapView = mapView.value,
                     polyline = routePolyline
                 )
 
-                // 🎨 Mapa con nuevo contenedor
                 EnhancedMapContainer(
                     viewModel = viewModel,
                     mapView = mapView,
@@ -433,7 +427,6 @@ private fun EnhancedMapContainer(
                 }
             )
 
-            // 🎨 Overlay decorativo en las esquinas
             DecorativeMapOverlay()
         }
     }
@@ -469,7 +462,6 @@ private fun DecorativeMapOverlay() {
     }
 }
 
-// 🎨 Función para actualizar el mapa con nuevos colores
 private fun updateMapWithNewColors(
     view: MapView,
     viewModel: RunMapViewModel,
@@ -495,7 +487,6 @@ private fun updateMapWithNewColors(
         }))
     }
 
-    // 🎨 Ruta planificada con nuevos colores
     if (runState != RunState.SETUP && viewModel.plannedRoute.isNotEmpty()) {
         plannedRoutePolyline.setPoints(viewModel.plannedRoute)
         plannedRoutePolyline.outlinePaint.apply {
@@ -507,7 +498,6 @@ private fun updateMapWithNewColors(
         view.overlays.add(plannedRoutePolyline)
     }
 
-    // 🎨 Ruta recorrida con gradiente
     if ((runState == RunState.RUNNING || runState == RunState.FINISHED) && viewModel.routePoints.isNotEmpty()) {
         routePolyline.setPoints(viewModel.routePoints)
         routePolyline.outlinePaint.apply {
@@ -524,7 +514,6 @@ private fun updateMapWithNewColors(
     startMarker.value?.let { view.overlays.add(it) }
     endMarker.value?.let { view.overlays.add(it) }
 
-    // Marcador de ubicación actual con nuevo diseño
     if (runState == RunState.RUNNING && currentLocation != null) {
         val currentMarker = Marker(view).apply {
             position = currentLocation
@@ -572,7 +561,7 @@ private fun updateMapWithNewColors(
     view.invalidate()
 }
 
-// Resto de funciones auxiliares...
+// Resto de funciones auxiliares
 @SuppressLint("MissingPermission")
 private fun startLocationUpdates(
     context: Context,
@@ -638,7 +627,6 @@ fun handleDestinationClick(
     }
 }
 
-// 🎨 Marcadores mejorados con la nueva paleta de colores
 fun createEnhancedStartMarker(context: Context): android.graphics.drawable.Drawable {
     val size = 70
     val paint = android.graphics.Paint().apply {
@@ -650,23 +638,19 @@ fun createEnhancedStartMarker(context: Context): android.graphics.drawable.Drawa
     val bitmap = android.graphics.Bitmap.createBitmap(size, size + 25, android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
 
-    // Sombra
     paint.color = android.graphics.Color.BLACK
     paint.alpha = 60
     canvas.drawCircle(size / 2f + 3, size / 2f + 3, size / 2f - 8, paint)
 
-    // Círculo principal con gradiente rosa-morado
     paint.color = android.graphics.Color.parseColor("#E91E63") // Rosa primario
     paint.alpha = 255
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Borde blanco más grueso
     paint.color = android.graphics.Color.WHITE
     paint.style = android.graphics.Paint.Style.STROKE
     paint.strokeWidth = 6f
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Ícono de play mejorado
     paint.style = android.graphics.Paint.Style.FILL
     paint.color = android.graphics.Color.WHITE
     val playPath = android.graphics.Path().apply {
@@ -677,7 +661,6 @@ fun createEnhancedStartMarker(context: Context): android.graphics.drawable.Drawa
     }
     canvas.drawPath(playPath, paint)
 
-    // Punta del marcador
     paint.color = android.graphics.Color.parseColor("#E91E63")
     val trianglePath = android.graphics.Path().apply {
         moveTo(size / 2f, size.toFloat())
@@ -701,23 +684,19 @@ fun createEnhancedFinishMarker(context: Context): android.graphics.drawable.Draw
     val bitmap = android.graphics.Bitmap.createBitmap(size, size + 25, android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
 
-    // Sombra
     paint.color = android.graphics.Color.BLACK
     paint.alpha = 60
     canvas.drawCircle(size / 2f + 3, size / 2f + 3, size / 2f - 8, paint)
 
-    // Círculo principal azul vibrante
     paint.color = android.graphics.Color.parseColor("#2196F3")
     paint.alpha = 255
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Borde blanco
     paint.color = android.graphics.Color.WHITE
     paint.style = android.graphics.Paint.Style.STROKE
     paint.strokeWidth = 6f
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8, paint)
 
-    // Bandera a cuadros mejorada
     paint.style = android.graphics.Paint.Style.FILL
     val squareSize = 4f
     for (i in 0..6) {
@@ -733,7 +712,6 @@ fun createEnhancedFinishMarker(context: Context): android.graphics.drawable.Draw
         }
     }
 
-    // Punta del marcador
     paint.color = android.graphics.Color.parseColor("#2196F3")
     val trianglePath = android.graphics.Path().apply {
         moveTo(size / 2f, size.toFloat())
@@ -755,21 +733,17 @@ fun createEnhancedCurrentLocationMarker(context: Context): android.graphics.draw
     val bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
 
-    // Anillo exterior con color de la paleta
-    paint.color = android.graphics.Color.parseColor("#E91E63") // Rosa primario
+    paint.color = android.graphics.Color.parseColor("#E91E63")
     paint.alpha = 120
     canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
 
-    // Anillo medio
     paint.color = android.graphics.Color.WHITE
     paint.alpha = 255
     canvas.drawCircle(size / 2f, size / 2f, size / 3f, paint)
 
-    // Punto central
     paint.color = android.graphics.Color.parseColor("#E91E63")
     canvas.drawCircle(size / 2f, size / 2f, size / 6f, paint)
 
-    // Borde del punto central
     paint.color = android.graphics.Color.WHITE
     paint.style = android.graphics.Paint.Style.STROKE
     paint.strokeWidth = 2f

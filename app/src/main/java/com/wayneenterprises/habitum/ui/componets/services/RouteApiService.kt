@@ -12,14 +12,12 @@ import java.net.URL
 class RouteApiService {
 
     companion object {
-        // OSRM servidor público - GRATIS y SIN API KEY
         private const val OSRM_BASE_URL = "https://router.project-osrm.org/route/v1"
     }
 
     suspend fun getWalkingRoute(start: GeoPoint, end: GeoPoint): List<GeoPoint> {
         return withContext(Dispatchers.IO) {
             try {
-                // Construir URL para OSRM (foot = caminata)
                 val url = "$OSRM_BASE_URL/foot/" +
                         "${start.longitude},${start.latitude};" +
                         "${end.longitude},${end.latitude}" +
@@ -108,16 +106,14 @@ class RouteApiService {
         println("🔄 Usando ruta fallback (línea recta mejorada)")
 
         val points = mutableListOf<GeoPoint>()
-        val steps = 100 // Muchos más puntos para suavizar
+        val steps = 100
 
         for (i in 0..steps) {
             val ratio = i.toDouble() / steps
 
-            // Interpolación con pequeña curvatura para simular calles
             val lat = start.latitude + (end.latitude - start.latitude) * ratio
             val lon = start.longitude + (end.longitude - start.longitude) * ratio
 
-            // Agregar pequeña variación para simular que sigue calles
             val variation = 0.0001 * kotlin.math.sin(ratio * kotlin.math.PI * 3)
 
             points.add(GeoPoint(lat + variation, lon + variation))
@@ -126,7 +122,6 @@ class RouteApiService {
         return points
     }
 
-    // Función para obtener información adicional de la ruta
     suspend fun getRouteInfo(start: GeoPoint, end: GeoPoint): RouteInfo {
         return withContext(Dispatchers.IO) {
             try {
@@ -160,7 +155,6 @@ class RouteApiService {
                 val distance = route.getDouble("distance") // en metros
                 val duration = route.getDouble("duration") // en segundos
 
-                // Parsear pasos si están disponibles
                 val steps = mutableListOf<String>()
                 if (route.has("legs")) {
                     val legs = route.getJSONArray("legs")
@@ -194,7 +188,7 @@ class RouteApiService {
     }
 
     private fun calculateDirectDistance(start: GeoPoint, end: GeoPoint): Double {
-        val R = 6371000.0 // Radio de la Tierra en metros
+        val R = 6371000.0
         val lat1 = Math.toRadians(start.latitude)
         val lat2 = Math.toRadians(end.latitude)
         val dLat = Math.toRadians(end.latitude - start.latitude)

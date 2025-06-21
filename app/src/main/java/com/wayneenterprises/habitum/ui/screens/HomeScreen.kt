@@ -81,19 +81,16 @@ fun HomeScreen(
     navController: NavController,
     taskViewModel: TaskViewModel = viewModel(),
     reminderViewModel: ReminderViewModel = viewModel(),
-    stepViewModel: StepViewModel = StepViewModel.getInstance(), // ✅ Usar instancia singleton
+    stepViewModel: StepViewModel = StepViewModel.getInstance(),
     authViewModel: AuthViewModel
 ) {
     val context = LocalContext.current
 
-    // 🔄 CONECTAR CON SERVICIO GLOBAL - SIN CONFIGURAR DETECTOR LOCAL
     LaunchedEffect(Unit) {
         println("🏠 HomeScreen - Conectando con servicio global")
 
-        // Actualizar la referencia del ViewModel en el servicio
         StepCounterService.updateViewModel(stepViewModel)
 
-        // Asegurar que el servicio esté activo
         if (!StepCounterService.isActive()) {
             println("🔄 HomeScreen - Reactivando servicio")
             StepCounterService.startDetection()
@@ -101,11 +98,10 @@ fun HomeScreen(
 
         println("📊 HomeScreen - Status del servicio: ${StepCounterService.getStatus()}")
 
-        // Inicializar datos si es necesario
         stepViewModel.initializeDailySteps()
     }
 
-    // 🆕 OBSERVAR DATOS GLOBALES PERSISTENTES
+    // OBSERVAR DATOS GLOBALES PERSISTENTES
     val tasks by taskViewModel.tasks.collectAsState()
     val reminders by reminderViewModel.reminders.collectAsState()
     val dailySteps by stepViewModel.dailySteps.collectAsState() // ✅ Datos GLOBALES
@@ -113,7 +109,6 @@ fun HomeScreen(
     val isLoading by stepViewModel.isLoading.collectAsState()   // ✅ Estado de carga
     val authState by authViewModel.uiState.collectAsState()
 
-    // Procesar datos para tareas y recordatorios
     val upcomingTasks = remember(tasks) {
         val now = Date()
         val calendar = Calendar.getInstance()
@@ -162,13 +157,13 @@ fun HomeScreen(
             )
         },
         containerColor = Color(0xFFF8F9FA),
-        modifier = Modifier.fillMaxSize() // ✅ CORREGIDO: Sin padding extra
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
-                .padding(10.dp), // ✅ CORREGIDO: Volvemos al padding simple que funcionaba
+                .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
@@ -312,7 +307,6 @@ fun HomeScreen(
                 }
             }
 
-            // ✅ CORREGIDO: Espaciado final para scroll completo
             item {
                 Spacer(modifier = Modifier.height(20.dp))
             }
@@ -320,7 +314,6 @@ fun HomeScreen(
     }
 }
 
-// ✅ FUNCIÓN CORREGIDA: CustomTopBarWithMenu con avatar centrado correctamente
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomTopBarWithMenu(
@@ -346,14 +339,12 @@ private fun CustomTopBarWithMenu(
             }
         },
         actions = {
-            // ✅ CORREGIDO: Contenedor con padding para centrar el avatar correctamente
             Box(
                 modifier = Modifier.padding(end = 16.dp) // Separación del borde derecho
             ) {
-                // Avatar del usuario (clickeable para mostrar menú)
                 Box(
                     modifier = Modifier
-                        .size(42.dp) // Tamaño ligeramente aumentado para mejor balance
+                        .size(42.dp)
                         .background(
                             Color.White.copy(alpha = 0.2f),
                             CircleShape
@@ -362,7 +353,6 @@ private fun CustomTopBarWithMenu(
                     contentAlignment = Alignment.Center
                 ) {
                     if (user != null && user.name.isNotEmpty()) {
-                        // Mostrar inicial del nombre
                         Text(
                             text = user.name.take(1).uppercase(),
                             color = Color.White,
@@ -370,7 +360,6 @@ private fun CustomTopBarWithMenu(
                             fontWeight = FontWeight.Bold
                         )
                     } else {
-                        // Icono por defecto
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Profile",
@@ -411,7 +400,7 @@ private fun CustomTopBarWithMenu(
                         )
                     }
 
-                    // Opción de cerrar sesión MEJORADA
+                    // Opción de cerrar sesión
                     DropdownMenuItem(
                         text = {
                             Row(
@@ -444,11 +433,10 @@ private fun CustomTopBarWithMenu(
             Brush.horizontalGradient(
                 colors = listOf(Color(0xFF8B5CF6), Color(0xFFEC4899))
             )
-        ) // ✅ CORREGIDO: Sin statusBarsPadding que causaba conflictos
+        )
     )
 }
 
-// ✅ STEPS CARD CORREGIDA - FUNCIONA CON DATOS GLOBALES
 @Composable
 private fun StepsCardPersistent(
     steps: Int,
@@ -458,7 +446,6 @@ private fun StepsCardPersistent(
     val progress = if (goal > 0) (steps.toFloat() / goal.toFloat()).coerceIn(0f, 1f) else 0f
     val percentage = (progress * 100).toInt()
 
-    // Animación del progreso
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(
@@ -475,7 +462,6 @@ private fun StepsCardPersistent(
         border = BorderStroke(1.dp, Color(0xFF8B5CF6).copy(alpha = 0.2f))
     ) {
         Box {
-            // Borde superior colorido
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -523,7 +509,6 @@ private fun StepsCardPersistent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ✅ MOSTRAR DATOS GLOBALES REALES
                 Text(
                     text = String.format("%,d", steps),
                     fontSize = 32.sp,
@@ -533,7 +518,6 @@ private fun StepsCardPersistent(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Progress bar
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

@@ -46,12 +46,11 @@ object ActivityMenuColors {
 @Composable
 fun ActivityMenuScreen(
     navController: NavController,
-    stepViewModel: StepViewModel = StepViewModel.getInstance() // ✅ Usar instancia singleton
+    stepViewModel: StepViewModel = StepViewModel.getInstance()
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    // 🔄 CONECTAR CON SERVICIO GLOBAL - SIN CONFIGURAR DETECTOR LOCAL
     LaunchedEffect(Unit) {
         println("🏃 ActivityMenuScreen - Conectando con servicio global")
 
@@ -76,10 +75,8 @@ fun ActivityMenuScreen(
     val dailyGoal by stepViewModel.dailyGoal.collectAsState()
     val isLoading by stepViewModel.isLoading.collectAsState()
 
-    // Estado para actividad seleccionada
     var selectedActivity by remember { mutableStateOf<String?>(null) }
 
-    // 🎨 NUEVO DISEÑO CON GRADIENTES
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -96,12 +93,10 @@ fun ActivityMenuScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🎨 Header mejorado
             EnhancedActivityHeader()
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 🔄 Indicador de carga
             if (isLoading) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -130,7 +125,6 @@ fun ActivityMenuScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // 🎨 Círculo principal mejorado con DATOS REALES
             EnhancedDailyStepsCircle(
                 steps = dailySteps,
                 goal = dailyGoal,
@@ -139,7 +133,6 @@ fun ActivityMenuScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 🎨 Información de progreso mejorada
             EnhancedProgressInfo(
                 steps = dailySteps,
                 goal = dailyGoal
@@ -147,7 +140,6 @@ fun ActivityMenuScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // 🎨 Botones de selección mejorados
             EnhancedActivitySelection(
                 selectedActivity = selectedActivity,
                 onActivitySelected = { selectedActivity = it }
@@ -155,7 +147,6 @@ fun ActivityMenuScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // 📊 GRÁFICO SEMANAL COMPLETAMENTE DINÁMICO
             EnhancedWeeklyStepsChart(
                 weeklyData = weeklySteps,
                 currentDaySteps = dailySteps,
@@ -166,7 +157,6 @@ fun ActivityMenuScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // 🎨 Botón de iniciar actividad mejorado
             selectedActivity?.let { activity ->
                 EnhancedStartActivityButton(
                     activity = activity,
@@ -256,14 +246,12 @@ private fun EnhancedDailyStepsCircle(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            // 🎨 Círculo de progreso con gradiente mejorado
             Canvas(
                 modifier = Modifier.fillMaxSize()
             ) {
                 val center = Offset(size.width / 2, size.height / 2)
                 val radius = size.minDimension / 2 - 24.dp.toPx()
 
-                // Círculo de fondo (gris claro)
                 drawCircle(
                     color = Color(0xFFE0E0E0),
                     radius = radius,
@@ -271,11 +259,9 @@ private fun EnhancedDailyStepsCircle(
                     style = Stroke(width = 20.dp.toPx())
                 )
 
-                // Círculo de progreso con gradiente simulado
                 if (animatedProgress > 0) {
                     val sweepAngle = 360f * animatedProgress
 
-                    // Crear efecto de gradiente con múltiples arcos
                     val colors = ActivityMenuColors.ProgressGradient
                     val segmentAngle = sweepAngle / colors.size
 
@@ -305,7 +291,6 @@ private fun EnhancedDailyStepsCircle(
                 }
             }
 
-            // 🎨 Contenido del círculo mejorado
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -518,14 +503,11 @@ private fun EnhancedWeeklyStepsChart(
     currentDaySteps: Int,
     modifier: Modifier = Modifier
 ) {
-    // 📊 DATOS COMPLETAMENTE DINÁMICOS - SIN SIMULACIÓN
     val days = listOf("Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do")
 
-    // ✅ USAR SOLO DATOS REALES DEL REPOSITORIO
     val realWeeklyData = remember(weeklyData, currentDaySteps) {
         val data = weeklyData.toMutableList()
 
-        // Asegurar que tenemos 7 días
         while (data.size < 7) {
             data.add(0)
         }
@@ -543,7 +525,6 @@ private fun EnhancedWeeklyStepsChart(
             else -> 0
         }
 
-        // ✅ ACTUALIZAR SOLO EL DÍA ACTUAL con pasos en tiempo real
         data[currentDay] = currentDaySteps
 
         println("📊 Gráfico DINÁMICO - Día actual: $currentDay, Pasos hoy: $currentDaySteps")
@@ -552,7 +533,6 @@ private fun EnhancedWeeklyStepsChart(
         data
     }
 
-    // Calcular máximo de datos reales
     val maxSteps = realWeeklyData.filter { it > 0 }.maxOrNull() ?: 1000
 
     Card(
@@ -586,7 +566,7 @@ private fun EnhancedWeeklyStepsChart(
                     val barHeight = if (steps > 0 && maxSteps > 0) {
                         (steps.toFloat() / maxSteps * 120).dp.coerceAtLeast(12.dp)
                     } else {
-                        12.dp // Altura mínima para días sin datos
+                        12.dp
                     }
 
                     // Obtener día actual para destacarlo
@@ -609,7 +589,6 @@ private fun EnhancedWeeklyStepsChart(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.Bottom
                     ) {
-                        // Mostrar valor SOLO para días con datos reales
                         if (steps > 0) {
                             Text(
                                 text = if (steps >= 1000) "${steps / 1000}k" else steps.toString(),
@@ -622,7 +601,6 @@ private fun EnhancedWeeklyStepsChart(
                             Spacer(modifier = Modifier.height(20.dp))
                         }
 
-                        // 🎨 Barra con gradiente mejorado
                         Box(
                             modifier = Modifier
                                 .width(32.dp)
@@ -649,7 +627,6 @@ private fun EnhancedWeeklyStepsChart(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Día de la semana
                         Text(
                             text = days[index],
                             fontSize = 13.sp,
@@ -660,7 +637,6 @@ private fun EnhancedWeeklyStepsChart(
                 }
             }
 
-            // 📊 Estadísticas REALES de la semana
             Spacer(modifier = Modifier.height(16.dp))
 
             val totalWeeklySteps = realWeeklyData.sum()

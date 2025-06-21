@@ -68,7 +68,6 @@ fun WalkingScreen(
         }
     }
 
-    // Animación del indicador de estado
     val pulseAnimation by rememberInfiniteTransition().animateFloat(
         initialValue = 0.8f,
         targetValue = 1.2f,
@@ -260,7 +259,6 @@ private fun MetricCard(
         )
     ) {
         Box {
-            // Borde superior colorido
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -277,7 +275,6 @@ private fun MetricCard(
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Icono
                 Text(
                     text = icon,
                     fontSize = 20.sp
@@ -285,7 +282,6 @@ private fun MetricCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Título
                 Text(
                     text = title,
                     fontSize = 14.sp,
@@ -295,7 +291,6 @@ private fun MetricCard(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Valor principal
                 Text(
                     text = value,
                     fontSize = 32.sp,
@@ -304,7 +299,6 @@ private fun MetricCard(
                     textAlign = TextAlign.Center
                 )
 
-                // Unidad (si existe)
                 if (unit.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(

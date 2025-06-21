@@ -11,10 +11,6 @@ class SupabaseRepository {
 
     private val client = SupabaseConfig.client
 
-    // ================================
-    // AUTH FUNCTIONS
-    // ================================
-
     suspend fun signIn(email: String, password: String): Result<User> {
         return try {
             println("🔐 SupabaseRepository.signIn - Iniciando login para: $email")
@@ -87,7 +83,6 @@ class SupabaseRepository {
         }
     }
 
-    fun getCurrentAuthUser() = client.auth.currentUserOrNull()
 
     suspend fun getCurrentUser(): Result<User?> {
         return try {
@@ -210,10 +205,6 @@ class SupabaseRepository {
         }
     }
 
-    // ================================
-    // FUNCIONES PARA TASKS
-    // ================================
-
     suspend fun insertTask(task: SupabaseTaskInsert): Result<SupabaseTask> {
         return try {
             println("📝 SupabaseRepository.insertTask - Insertando tarea: ${task.title}")
@@ -306,10 +297,6 @@ class SupabaseRepository {
             Result.failure(e)
         }
     }
-
-    // ================================
-    // FUNCIONES PARA REMINDERS
-    // ================================
 
     suspend fun insertReminder(reminder: SupabaseReminderInsert): Result<SupabaseReminder> {
         return try {
@@ -404,9 +391,6 @@ class SupabaseRepository {
         }
     }
 
-    // ================================
-    // FUNCIONES PARA DAILY STEPS - CORREGIDAS
-    // ================================
 
     suspend fun getUserDailySteps(userId: String): Result<List<SupabaseDailySteps>> {
         return try {
@@ -420,7 +404,6 @@ class SupabaseRepository {
                 }
                 .decodeList<SupabaseDailySteps>()
 
-            // Ordenar por fecha en código Kotlin (más reciente primero)
             val sortedSteps = steps.sortedByDescending { it.date }
 
             println("✅ SupabaseRepository - Obtenidos ${sortedSteps.size} registros de pasos")
@@ -501,47 +484,5 @@ class SupabaseRepository {
         }
     }
 
-    suspend fun getDailyStepsForDateRange(userId: String, startDate: String, endDate: String): Result<List<SupabaseDailySteps>> {
-        return try {
-            println("📊 SupabaseRepository.getDailyStepsForDateRange - Usuario: $userId, Rango: $startDate a $endDate")
 
-            val steps = client.from("daily_steps")
-                .select {
-                    filter {
-                        eq("user_id", userId)
-                        gte("date", startDate)
-                        lte("date", endDate)
-                    }
-                }
-                .decodeList<SupabaseDailySteps>()
-
-            // Ordenar por fecha en código Kotlin (más antiguo primero para rangos)
-            val sortedSteps = steps.sortedBy { it.date }
-
-            println("✅ SupabaseRepository - Obtenidos ${sortedSteps.size} registros en el rango")
-            Result.success(sortedSteps)
-        } catch (e: Exception) {
-            println("❌ SupabaseRepository.getDailyStepsForDateRange - Error: ${e.message}")
-            Result.failure(e)
-        }
-    }
-
-    suspend fun deleteDailyStepsForDate(userId: String, date: String): Result<Unit> {
-        return try {
-            println("🗑️ SupabaseRepository.deleteDailyStepsForDate - Usuario: $userId, Fecha: $date")
-
-            client.from("daily_steps").delete {
-                filter {
-                    eq("user_id", userId)
-                    eq("date", date)
-                }
-            }
-
-            println("✅ SupabaseRepository - Registro eliminado")
-            Result.success(Unit)
-        } catch (e: Exception) {
-            println("❌ SupabaseRepository.deleteDailyStepsForDate - Error: ${e.message}")
-            Result.failure(e)
-        }
-    }
 }

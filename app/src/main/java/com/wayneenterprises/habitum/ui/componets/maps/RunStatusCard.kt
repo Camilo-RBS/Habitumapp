@@ -22,12 +22,11 @@ import com.wayneenterprises.habitum.ui.screens.physical.RunState
 @Composable
 fun RunStatusCard(
     runState: RunState,
-    isSelectingStart: Boolean, // Mantengo por compatibilidad pero no se usa
+    isSelectingStart: Boolean,
     elapsedTime: Long,
     totalDistance: Double,
     stepCount: Int
 ) {
-    // ✅ DEBUG: Para detectar duplicaciones
     println("🔍 RunStatusCard renderizada - Estado: $runState - Tiempo: ${System.currentTimeMillis()}")
 
     Card(

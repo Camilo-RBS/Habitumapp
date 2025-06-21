@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class SupabaseDailySteps(
     val id: String = "",
     @SerialName("user_id") val userId: String = "",
-    val date: String = "", // formato: "2024-12-19"
+    val date: String = "",
     val steps: Int = 0,
     @SerialName("created_at") val createdAt: String = "",
     @SerialName("updated_at") val updatedAt: String = ""

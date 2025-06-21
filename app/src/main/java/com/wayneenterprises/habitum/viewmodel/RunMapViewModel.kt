@@ -34,7 +34,6 @@ class RunMapViewModel : ViewModel() {
     var isLoadingRoute = mutableStateOf(false)
     var routeLoadError = mutableStateOf<String?>(null)
 
-    // 🔥 NUEVO: Job para controlar las corrutinas de cálculo de ruta
     private var routeCalculationJob: Job? = null
 
     private val arrivalThreshold = 15.0
@@ -44,7 +43,6 @@ class RunMapViewModel : ViewModel() {
     fun reset() {
         println("🔄 Reseteando ViewModel...")
 
-        // ✅ CANCELAR cualquier cálculo de ruta en progreso
         routeCalculationJob?.cancel()
         routeCalculationJob = null
 
@@ -63,7 +61,6 @@ class RunMapViewModel : ViewModel() {
         isNavigating.value = false
         hasArrivedAtDestination.value = false
 
-        // ✅ RESETEAR estados de carga
         isLoadingRoute.value = false
         routeLoadError.value = null
 
@@ -133,7 +130,6 @@ class RunMapViewModel : ViewModel() {
         println("🎯 Destino: $end")
 
         if (start != null && end != null) {
-            // ✅ CANCELAR cualquier cálculo anterior
             routeCalculationJob?.cancel()
 
             routeCalculationJob = viewModelScope.launch {
@@ -269,27 +265,22 @@ class RunMapViewModel : ViewModel() {
         return R * c
     }
 
-    // 🔥 NUEVA FUNCIÓN: Para mostrar la ruta completa (inicio + planificada + recorrida)
     fun getCompleteRoute(): List<GeoPoint> {
         val completeRoute = mutableListOf<GeoPoint>()
 
-        // Agregar punto de inicio si existe
         startPoint.value?.let { start ->
             completeRoute.add(start)
         }
 
-        // Agregar ruta planificada si existe
         if (plannedRoute.isNotEmpty()) {
             completeRoute.addAll(plannedRoute)
         }
 
-        // Si hay ruta recorrida, usarla en lugar de la planificada
         if (routePoints.isNotEmpty()) {
             completeRoute.clear()
             completeRoute.addAll(routePoints)
         }
 
-        // Agregar punto final si existe y no está ya incluido
         endPoint.value?.let { end ->
             if (completeRoute.isEmpty() || distanceBetween(completeRoute.last(), end) > 10) {
                 completeRoute.add(end)

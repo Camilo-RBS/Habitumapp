@@ -1,11 +1,11 @@
 package com.wayneenterprises.habitum.repository
 
-import com.wayneenterprises.habitum.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.datetime.Clock
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class DailyStepsRepository {
     private val supabaseRepository = SupabaseRepository()
@@ -68,19 +68,19 @@ class DailyStepsRepository {
         }
     }
 
-    // 💾 Guardar o actualizar pasos del día actual
+
     suspend fun saveTodaySteps(userId: String, steps: Int): Result<Unit> {
         val today = getCurrentDateString()
 
         try {
             println("💾 Intentando guardar $steps pasos para fecha: $today")
 
-            // Intentar guardar en Supabase PRIMERO
+
             return supabaseRepository.upsertDailySteps(userId, today, steps).fold(
                 onSuccess = {
                     println("✅ Pasos guardados exitosamente en Supabase")
 
-                    // Actualizar en memoria DESPUÉS del éxito en BD
+
                     val currentHistory = _dailyStepsHistory.value.toMutableMap()
                     currentHistory[today] = steps
                     _dailyStepsHistory.value = currentHistory
@@ -110,7 +110,7 @@ class DailyStepsRepository {
         }
     }
 
-    // 📈 Obtener pasos de los últimos 7 días (incluyendo hoy)
+    //  Obtener pasos de los últimos 7 días (incluyendo hoy)
     fun getWeeklySteps(): List<Int> {
         val calendar = Calendar.getInstance()
         val weeklySteps = mutableListOf<Int>()
@@ -142,37 +142,6 @@ class DailyStepsRepository {
         return todaySteps
     }
 
-    // 📅 Obtener pasos de una fecha específica
-    fun getStepsForDate(date: String): Int {
-        return _dailyStepsHistory.value[date] ?: 0
-    }
-
-    // 🧹 Limpiar errores
-    fun clearError() {
-        _error.value = null
-    }
-
-    // 📊 Obtener estadísticas semanales
-    fun getWeeklyStats(): Map<String, Any> {
-        val weeklySteps = getWeeklySteps()
-        val totalSteps = weeklySteps.sum()
-        val daysWithSteps = weeklySteps.count { it > 0 }
-        val averageSteps = if (daysWithSteps > 0) totalSteps / daysWithSteps else 0
-        val maxSteps = weeklySteps.maxOrNull() ?: 0
-
-        return mapOf(
-            "total" to totalSteps,
-            "average" to averageSteps,
-            "max" to maxSteps,
-            "daysActive" to daysWithSteps
-        )
-    }
-
-    // 🔄 Función para refrescar datos desde la BD
-    suspend fun refreshData(userId: String) {
-        println("🔄 Refrescando datos desde BD...")
-        loadUserDailySteps(userId)
-    }
 
     // 📅 Debug: Imprimir estado actual
     fun debugState() {
@@ -189,17 +158,5 @@ class DailyStepsRepository {
         println("  - Error: ${_error.value}")
     }
 
-    // 🆕 Función para verificar si tenemos datos para hoy
-    fun hasTodayData(): Boolean {
-        val today = getCurrentDateString()
-        return _dailyStepsHistory.value.containsKey(today)
-    }
 
-    // 🆕 Función para forzar la actualización de un día específico
-    fun updateDaySteps(date: String, steps: Int) {
-        val currentHistory = _dailyStepsHistory.value.toMutableMap()
-        currentHistory[date] = steps
-        _dailyStepsHistory.value = currentHistory
-        println("📊 Actualización manual para $date: $steps pasos")
-    }
 }

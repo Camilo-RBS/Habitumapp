@@ -122,10 +122,8 @@ class AuthViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             try {
-                // Cerrar sesión en Supabase
                 repository.signOut()
 
-                // Limpiar completamente el estado
                 _uiState.value = AuthUiState(
                     isLoading = false,
                     isAuthenticated = false,
@@ -138,7 +136,6 @@ class AuthViewModel : ViewModel() {
                 println("🚪 Sesión cerrada correctamente")
 
             } catch (e: Exception) {
-                // Incluso si hay error, limpiar el estado local
                 _uiState.value = AuthUiState(
                     isLoading = false,
                     isAuthenticated = false,
@@ -157,10 +154,4 @@ class AuthViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }
 
-    // Función para forzar recheck del usuario (útil después de actualizaciones)
-    fun refreshUser() {
-        viewModelScope.launch {
-            checkCurrentUser()
-        }
-    }
 }

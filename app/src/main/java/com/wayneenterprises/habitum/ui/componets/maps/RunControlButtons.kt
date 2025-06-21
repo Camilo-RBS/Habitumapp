@@ -68,7 +68,6 @@ fun RunControlButtons(
             }
 
             RunState.READY -> {
-                // 🎨 Botón principal MEJORADO - Sin sombras problemáticas
                 Button(
                     onClick = {
                         viewModel.startRun()
@@ -230,7 +229,6 @@ fun RunControlButtons(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // 🎨 Botón de terminar CORREGIDO - Sin sombras problemáticas
                     Button(
                         onClick = { viewModel.finishRun() },
                         modifier = Modifier
@@ -274,12 +272,10 @@ fun RunControlButtons(
             }
 
             RunState.FINISHED -> {
-                // 🎨 Botones finales COMPLETAMENTE CORREGIDOS
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // ✅ Botón Nueva Carrera - MEJORADO
                     Button(
                         onClick = {
                             viewModel.reset()

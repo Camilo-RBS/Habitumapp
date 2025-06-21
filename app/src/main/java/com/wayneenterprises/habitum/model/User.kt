@@ -10,7 +10,7 @@ data class User(
     @SerialName("auth_id") val authId: String = "",
     val name: String = "",
     val email: String = "",
-    @SerialName("user_type") val userType: String = "normal", // "admin" o "normal"
+    @SerialName("user_type") val userType: String = "normal",
     @SerialName("created_at") val createdAt: String = "",
     @SerialName("updated_at") val updatedAt: String = ""
 )

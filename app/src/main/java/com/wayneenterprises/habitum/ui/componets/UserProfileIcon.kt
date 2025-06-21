@@ -26,14 +26,12 @@ fun UserProfileIcon(
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Solo mostrar si el usuario no es admin
     if (user == null || user.userType == "admin") return
 
     var showDropdown by remember { mutableStateOf(false) }
     var isSigningOut by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        // Ícono de perfil
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -56,7 +54,6 @@ fun UserProfileIcon(
                     strokeWidth = 2.dp
                 )
             } else {
-                // Iniciales del usuario o ícono por defecto
                 if (user.name.isNotEmpty()) {
                     Text(
                         text = user.name.take(1).uppercase(),
@@ -82,7 +79,6 @@ fun UserProfileIcon(
             properties = PopupProperties(dismissOnBackPress = true),
             modifier = Modifier.wrapContentWidth()
         ) {
-            // Header del menú con info del usuario
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -106,18 +102,14 @@ fun UserProfileIcon(
                 thickness = 1.dp
             )
 
-            // Opción de cerrar sesión
             DropdownMenuItem(
                 onClick = {
                     println("🚪 Usuario solicitó cerrar sesión")
                     showDropdown = false
                     isSigningOut = true
 
-                    // Llamar al cierre de sesión
                     onSignOut()
 
-                    // Reset del estado después de un delay
-                    // El estado se limpiará cuando AuthViewModel actualice
                 },
                 text = {
                     Row(
@@ -143,7 +135,6 @@ fun UserProfileIcon(
         }
     }
 
-    // Reset del estado cuando el usuario ya no está autenticado
     LaunchedEffect(user) {
         if (user == null) {
             isSigningOut = false
