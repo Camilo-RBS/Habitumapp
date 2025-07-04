@@ -240,53 +240,5 @@ fun LoginScreen(
             }
         }
 
-        // Credenciales de admin para testing
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Credenciales del Único Administrador",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF667eea)
-                )
-                Text(
-                    text = "Email: wayneenterprises@gmail.com",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                Text(
-                    text = "Password: batman2507",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                Text(
-                    text = "Solo existe un administrador en el sistema",
-                    fontSize = 10.sp,
-                    color = Color.Gray.copy(alpha = 0.7f)
-                )
-
-                Button(
-                    onClick = {
-                        email = "wayneenterprises@gmail.com"
-                        password = "batman2507"
-                        isLoginMode = true
-                    },
-                    modifier = Modifier.padding(top = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF667eea).copy(alpha = 0.8f)
-                    )
-                ) {
-                    Text("Usar credenciales admin", fontSize = 12.sp)
-                }
-            }
-        }
     }
 }

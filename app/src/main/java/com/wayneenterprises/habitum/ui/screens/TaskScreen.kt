@@ -1,5 +1,6 @@
 package com.wayneenterprises.habitum.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,7 +21,7 @@ import com.wayneenterprises.habitum.model.Task
 
 @Composable
 fun TaskScreen(
-    selectedCategory: String = "", // Cambiar de selectedTaskId a selectedCategory
+    selectedCategory: String = "",
     taskViewModel: TaskViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel()
 ) {
@@ -32,41 +34,35 @@ fun TaskScreen(
     var editingTask by remember { mutableStateOf<Task?>(null) }
     var selectedCategory by remember { mutableStateOf(selectedCategory.ifEmpty { "All" }) }
 
-    // Manejar navegación específica a una categoría
-    LaunchedEffect(selectedCategory) {
-        if (selectedCategory.isNotEmpty() && selectedCategory != "All") {
-            println("🎯 TaskScreen - Filtrando por categoría: $selectedCategory")
-        }
-    }
-
     val categories = tasks.map { it.category }.distinct()
     val activeTasks = tasks.filter { !it.isCompleted }
 
-    val filteredTasks = if (selectedCategory == "All") {
-        tasks
-    } else {
-        tasks.filter { it.category == selectedCategory }
-    }
+    val filteredTasks = if (selectedCategory == "All") tasks else tasks.filter { it.category == selectedCategory }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1E3C72),
+                        Color(0xFF2A5298)
+                    )
+                )
+            )
     ) {
-        // Header con perfil de usuario
+        // Header
         ScreenHeader(
             title = "Tareas",
             user = authState.currentUser,
             onSignOut = {
-                println("🚪 TaskScreen - Solicitando cierre de sesión")
                 authViewModel.signOut()
             }
         )
 
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Welcome Header
             WelcomeHeader(
                 userName = authState.currentUser?.name ?: "Usuario",
                 activeTasksCount = activeTasks.size
@@ -74,7 +70,6 @@ fun TaskScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Category Filter
             CategoryFilter(
                 categories = categories,
                 selectedCategory = selectedCategory,
@@ -83,20 +78,18 @@ fun TaskScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // All Tasks Title
             Text(
-                text = "All Tasks (${filteredTasks.size})",
+                text = "Todas las tareas (${filteredTasks.size})",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(horizontal = 0.dp)
+                fontSize = 20.sp
             )
 
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // Loading indicator
+        // Loading
         if (isLoading) {
             Box(
                 modifier = Modifier
@@ -104,48 +97,34 @@ fun TaskScreen(
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = Color.White
+                        color = Color(0xFF90CAF9) // Azul claro
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Cargando tareas...",
-                        color = Color.White
-                    )
+                    Text("Cargando tareas...", color = Color.White)
                 }
             }
         }
 
-        // Error message
+        // Error
         error?.let { errorMessage ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f))
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFEF9A9A)) // Rojo claro
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "❌ Error:",
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red
-                    )
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("❌ Error:", color = Color.Red, fontWeight = FontWeight.Bold)
+                    Text(errorMessage, color = Color.Red)
                     Button(
                         onClick = {
                             taskViewModel.clearError()
                             taskViewModel.refreshTasks()
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
                     ) {
                         Text("Reintentar")
                     }
@@ -153,7 +132,7 @@ fun TaskScreen(
             }
         }
 
-        // Empty state o Tasks List
+        // Lista de tareas o vacío
         if (!isLoading && error == null) {
             if (filteredTasks.isEmpty()) {
                 Box(
@@ -162,27 +141,13 @@ fun TaskScreen(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "📋",
-                            fontSize = 48.sp
-                        )
-                        Text(
-                            text = "No hay tareas",
-                            fontSize = 18.sp,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = "¡Crea tu primera tarea!",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("📋", fontSize = 48.sp)
+                        Text("No hay tareas", fontSize = 18.sp, color = Color.White)
+                        Text("¡Crea tu primera tarea!", fontSize = 14.sp, color = Color.White.copy(0.7f))
                     }
                 }
             } else {
-                // Tasks List
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
@@ -192,16 +157,9 @@ fun TaskScreen(
                     items(filteredTasks) { task ->
                         TaskItem(
                             task = task,
-                            onToggle = {
-                                println("🔄 TaskScreen - Toggling tarea: ${task.id}")
-                                taskViewModel.toggleTaskCompleted(task.id)
-                            },
-                            onDelete = {
-                                println("🗑️ TaskScreen - Eliminando tarea: ${task.id}")
-                                taskViewModel.deleteTask(task.id)
-                            },
+                            onToggle = { taskViewModel.toggleTaskCompleted(task.id) },
+                            onDelete = { taskViewModel.deleteTask(task.id) },
                             onEdit = {
-                                println("✏️ TaskScreen - Editando tarea: ${task.id}")
                                 editingTask = task
                                 showForm = true
                             }
@@ -210,14 +168,11 @@ fun TaskScreen(
                 }
             }
         } else {
-            // Spacer para cuando hay loading o error
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        // Add Task Button
         AddTaskButton(
             onClick = {
-                println("➕ TaskScreen - Abriendo formulario para nueva tarea")
                 editingTask = null
                 showForm = true
             }
@@ -226,36 +181,15 @@ fun TaskScreen(
         Spacer(modifier = Modifier.height(16.dp))
     }
 
-    // Dialog de formulario
     if (showForm) {
         NewTaskDialog(
             taskToEdit = editingTask,
-            onDismiss = {
-                println("❌ TaskScreen - Cerrando formulario")
-                showForm = false
-            },
+            onDismiss = { showForm = false },
             onSave = { title, category, description, dueDate, completionDate, priority, id ->
                 if (id.isBlank()) {
-                    println("➕ TaskScreen - Creando nueva tarea: '$title'")
-                    taskViewModel.addTask(
-                        title = title,
-                        description = description,
-                        category = category,
-                        priority = priority,
-                        dueDate = dueDate,
-                        completionDate = completionDate
-                    )
+                    taskViewModel.addTask(title, description, category, priority, dueDate, completionDate)
                 } else {
-                    println("✏️ TaskScreen - Actualizando tarea: $id")
-                    taskViewModel.updateTask(
-                        id = id,
-                        title = title,
-                        description = description,
-                        category = category,
-                        priority = priority,
-                        dueDate = dueDate,
-                        completionDate = completionDate
-                    )
+                    taskViewModel.updateTask(id, title, description, category, priority, dueDate, completionDate)
                 }
                 showForm = false
             }
